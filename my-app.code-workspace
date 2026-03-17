@@ -13,6 +13,7 @@
 			120
 		],
 		"prettier.printWidth": 120,
-		"prettier.semi": false
+		"prettier.semi": false,
+		"editor.wordWrapColumn": 120,
 	}
 }
