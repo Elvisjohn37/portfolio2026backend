@@ -10,7 +10,7 @@ dotenv.config()
 
 const PORT = process.env.PORT || 8080
 
-connectDb()
+await connectDb()
 
 app.use(cors())
 
