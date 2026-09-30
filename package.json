@@ -5,21 +5,29 @@
 	"main": "src/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1",
-		"dev": "nodemon /src",
+		"dev": "nodemon src/index.js",
 		"build": "babel src -d dist",
-		"start": "node dist"
+		"start": "node dist",
+		"seed": "node src/scripts/seed.js",
+		"inspect:data": "node src/scripts/inspect.js"
 	},
 	"keywords": [],
 	"author": "",
 	"license": "ISC",
 	"type": "module",
 	"dependencies": {
+		"bcryptjs": "^3.0.2",
+		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.6",
 		"dotenv": "^17.3.1",
 		"express": "^5.2.1",
+		"express-rate-limit": "^8.2.1",
+		"helmet": "^8.1.0",
+		"jsonwebtoken": "^9.0.2",
 		"lodash": "^4.17.23",
 		"mongoose": "^9.3.0",
-		"nodemon": "^3.1.14"
+		"nodemon": "^3.1.14",
+		"yup": "^1.7.1"
 	},
 	"devDependencies": {
 		"@babel/cli": "^7.28.6",

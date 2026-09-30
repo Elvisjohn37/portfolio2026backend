@@ -1,0 +1,4 @@
+[dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+Connected to MongoDB
+Listening to port:  8080
+istening to port:  8080

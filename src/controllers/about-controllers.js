@@ -42,7 +42,7 @@ const getTechStacks = async (_req, res) => {
 const getAboutTechStacks = async (req, res) => {
 	let { techStack } = req.params
 	techStack = techStack.charAt(0).toUpperCase() + techStack.slice(1)
-	const id = "69b7b3deae50c7eb975112fd"
+	const id = process.env.ABOUT_ID || (await About.findOne().select("_id"))?._id
 
 	try {
 		if (!mongoose.isValidObjectId(id))
@@ -90,4 +90,95 @@ const getAboutTechStacks = async (req, res) => {
 	}
 }
 
-export { getHomeData, getAboutData, getTechStacks, getAboutTechStacks }
+// ---------------------------------------------------------------------------
+// Admin CRUD (all routes below are protected by requireAuth)
+// ---------------------------------------------------------------------------
+
+/** GET /api/about - list every profile document (usually just one). */
+const listAbout = async (_req, res) => {
+	try {
+		const profiles = await About.find().sort({ createdAt: 1 })
+
+		return res.status(200).json({
+			message: "",
+			data: { profiles: profiles.map(profile => profile.toObject()), total: profiles.length },
+			success: true,
+		})
+	} catch {
+		return res.status(500).json({ message: "Server error", data: {}, success: false })
+	}
+}
+
+/** POST /api/about */
+const createAbout = async (req, res) => {
+	try {
+		const profile = await About.create(req.validated.body)
+
+		return res.status(201).json({
+			message: "Profile created",
+			data: { profile: profile.toObject() },
+			success: true,
+		})
+	} catch (err) {
+		if (err?.name === "ValidationError")
+			return res.status(422).json({
+				message: "Please check the highlighted fields",
+				data: {},
+				success: false,
+			})
+
+		return res.status(500).json({ message: "Server error", data: {}, success: false })
+	}
+}
+
+/** PUT /api/about/:id */
+const updateAbout = async (req, res) => {
+	const { id } = req.validated.params
+
+	try {
+		const profile = await About.findByIdAndUpdate(id, req.validated.body, {
+			new: true,
+			runValidators: true,
+		})
+
+		if (!profile)
+			return res.status(404).json({ message: "Profile not found", data: {}, success: false })
+
+		return res.status(200).json({
+			message: "Profile updated",
+			data: { profile: profile.toObject() },
+			success: true,
+		})
+	} catch {
+		return res.status(500).json({ message: "Server error", data: {}, success: false })
+	}
+}
+
+/** DELETE /api/about/:id */
+const deleteAbout = async (req, res) => {
+	const { id } = req.validated.params
+
+	try {
+		const profile = await About.findByIdAndDelete(id)
+
+		if (!profile)
+			return res.status(404).json({ message: "Profile not found", data: {}, success: false })
+
+		await AboutTechStack.deleteMany({ about: id })
+
+		return res.status(200).json({ message: "Profile removed", data: { _id: id }, success: true })
+	} catch {
+		return res.status(500).json({ message: "Server error", data: {}, success: false })
+	}
+}
+
+export {
+	getHomeData,
+	getAboutData,
+	getTechStacks,
+	getAboutTechStacks,
+	listAbout,
+	createAbout,
+	updateAbout,
+	deleteAbout,
+}
