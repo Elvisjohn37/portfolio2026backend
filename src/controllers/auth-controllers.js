@@ -8,12 +8,14 @@ const INVALID_CREDENTIALS = "Invalid email or password"
 /** POST /api/auth/login */
 const login = async (req, res) => {
 	const { email, password } = req.validated.body
+	let stage = "account lookup"
 
 	try {
 		const user = await AdminUser.findOne({ email }).select("+password")
 
 		if (!user) return failure(res, { message: INVALID_CREDENTIALS, status: 401 })
 
+		stage = "password verification"
 		const passwordMatches = await user.verifyPassword(password)
 
 		// Same message for both cases so the endpoint cannot be used to
@@ -23,10 +25,13 @@ const login = async (req, res) => {
 		if (!user.isActive)
 			return failure(res, { message: "This account has been deactivated", status: 403 })
 
+		stage = "token signing"
 		const token = signAccessToken(user)
 
+		stage = "last login update"
 		await AdminUser.updateOne({ _id: user._id }, { lastLoginAt: new Date() })
 
+		stage = "response serialization"
 		return success(res, {
 			message: "Signed in successfully",
 			data: {
@@ -35,7 +40,13 @@ const login = async (req, res) => {
 				user: user.toSafeJSON(),
 			},
 		})
-	} catch {
+	} catch (error) {
+		// Keep credentials, tokens, database details, and secret values out of logs.
+		console.error("Admin login failed", {
+			stage,
+			errorType: error?.name || "Error",
+			jwtSecretConfigured: Boolean(process.env.JWT_SECRET),
+		})
 		return failure(res)
 	}
 }
