@@ -12,6 +12,7 @@ import projectRouter from "./routes/project-routes.js"
 import workExperienceRouter from "./routes/work-experience-routes.js"
 import messageRouter from "./routes/message-routes.js"
 import dashboardRouter from "./routes/dashboard-routes.js"
+import mediaRouter from "./routes/media-routes.js"
 import { notFoundHandler, errorHandler } from "./middleware/error-handler.js"
 
 const app = express()
@@ -31,6 +32,7 @@ app.use(helmet({ crossOriginResourcePolicy: false }))
 // an open CORS policy does not expose the session.
 app.use(cors())
 
+app.use("/api/media", mediaRouter)
 app.use(express.json({ limit: "1mb" }))
 
 app.use(cookieParser())
