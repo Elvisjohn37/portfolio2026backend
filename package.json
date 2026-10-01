@@ -9,7 +9,8 @@
 		"build": "babel src -d dist",
 		"start": "node dist",
 		"seed": "node src/scripts/seed.js",
-		"inspect:data": "node src/scripts/inspect.js"
+		"inspect:data": "node src/scripts/inspect.js",
+		"fix:media": "node src/scripts/fix-media.js"
 	},
 	"keywords": [],
 	"author": "",
